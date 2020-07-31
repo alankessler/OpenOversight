@@ -151,11 +151,11 @@ def build_salary(officer):
 
 def assign_faces(officer, images):
     if random.uniform(0, 1) >= 0.5:
-        # for num in range(1, len(images)):  # <-- bug here, we always return on the first one, the for-loop is unneeded
-        img_id = random.choice(images).id
-        return models.Face(officer_id=officer.id,
-                           img_id=img_id,
-                           original_image_id=img_id)
+        for num in range(1, len(images)):
+            return models.Face(officer_id=officer.id,
+                               img_id=num,
+                               original_image_id=random.choice(images).id,
+                               featured=False)
     else:
         return False
 
