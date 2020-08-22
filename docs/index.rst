@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to OpenOversight's documentation!
+Welcome to Cop.Photos' documentation!
 =========================================
 
 .. toctree::
@@ -14,7 +14,7 @@ Welcome to OpenOversight's documentation!
    bulk_upload
    advanced_csv_import
 
-OpenOversight is a Lucy Parsons Labs project to improve law enforcement
+Cop.Photos is a Portland, Oregon specific fork of OpenOversight, a Lucy Parsons Labs project to improve law enforcement
 accountability through public and crowdsourced data. We maintain a database
 of officer demographic information and provide digital galleries of photographs.
 This is done to help people identify law enforcement officers for filing
