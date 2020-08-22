@@ -757,7 +757,7 @@ def test_ac_can_add_new_officer_with_unit_in_their_dept(mockdata, client, sessio
     with current_app.test_request_context():
         login_ac(client)
         department = Department.query.filter_by(id=AC_DEPT).first()
-        unit = random.choice(unit_choices())
+        unit = random.choice(unit_choices(department_id=department.id))
         first_name = 'Testy'
         last_name = 'OTester'
         middle_initial = 'R'
@@ -922,7 +922,7 @@ def test_ac_can_edit_officer_in_their_dept(mockdata, client, session):
     with current_app.test_request_context():
         login_ac(client)
         department = Department.query.filter_by(id=AC_DEPT).first()
-        unit = random.choice(unit_choices())
+        unit = random.choice(unit_choices(department.id))
         first_name = 'Testier'
         last_name = 'OTester'
         middle_initial = 'R'
@@ -1214,7 +1214,10 @@ def test_assignments_csv(mockdata, client, session):
         )
         csv_data = rv.data.decode('utf-8')
         csv_reader = csv.DictReader(csv_data.split("\n"))
-        lines = [row for row in csv_reader if int(row["officer id"]) == officer.id]
+        all_rows = [row for row in csv_reader]
+        for row in all_rows:
+            assert Officer.query.get(int(row["officer id"])).department_id == department.id
+        lines = [row for row in all_rows if int(row["officer id"]) == officer.id]
         assert len(lines) == 2
         assert lines[0]["officer unique identifier"] == officer.unique_internal_identifier
         assert lines[1]["officer unique identifier"] == officer.unique_internal_identifier
