@@ -49,7 +49,7 @@ def create_app(config_name='default'):
 
     max_log_size = 10 * 1024 * 1024  # start new log file after 10 MB
     num_logs_to_keep = 5
-    file_handler = RotatingFileHandler('/tmp/openoversight.log', 'a',
+    file_handler = RotatingFileHandler('/home/pdx/openoversight.log', 'a',
                                        max_log_size, num_logs_to_keep)
 
     file_handler.setFormatter(

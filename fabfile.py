@@ -15,31 +15,31 @@ env.use_ssh_config = False
 # being done in dev to assign env a key_filename
 
 
-def staging():
-    env.environment = 'staging'
-    env.user = 'root'
-    env.hosts = 'staging.openoversight.lucyparsonslabs.com'
-    env.unprivileged_user = 'nginx'
-    env.venv_dir = '/home/nginx/oovirtenv/venv'
-    env.code_dir = '/home/nginx/oovirtenv/venv/OpenOversight'
-    env.backup_dir = '/home/nginx/openoversight_backup'
-    env.s3bucket = 'openoversight-staging'
+#def staging():
+#    env.environment = 'staging'
+#    env.user = 'root'
+#    env.hosts = 'cops.photo'
+#    env.unprivileged_user = 'pdx'
+#    env.venv_dir = '/srv/oopdx'
+#    env.code_dir = '/home/pdx/OpenOversight'
+#    env.backup_dir = '/home/pdx/openoversight_backup'
+#    env.s3bucket = 'openoversight-pdx-staging'
 
 
 def production():
     env.environment = 'production'
     env.user = 'root'
-    env.hosts = 'openoversight.lucyparsonslabs.com'
-    env.unprivileged_user = 'nginx'
-    env.venv_dir = '/home/nginx/oovirtenv'
-    env.code_dir = '/home/nginx/oovirtenv/OpenOversight'
-    env.backup_dir = '/home/nginx/openoversight_backup'
-    env.s3bucket = 'openoversight-prod'
+    env.hosts = 'cops.photo'
+    env.unprivileged_user = 'pdx'
+    env.venv_dir = '/home/pdx/oopdxvenv'
+    env.code_dir = '/home/pdx/oopdxvenv/OpenOversight'
+    env.backup_dir = '/home/pdx/OpenOversight_backup'
+    env.s3bucket = 'openoversight-pdx'
 
 
 env.roledefs = {
-    'staging': staging(),
-    'prod': 'openoversight.com',
+    #'staging': staging(),
+    'prod': 'cops.photo',
 }
 
 
@@ -69,9 +69,9 @@ def backup():
         backup_datetime = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
         run('%s/bin/python %s/OpenOversight/db_backup.py' % (env.venv_dir, env.code_dir))
         run('mv backup.sql backup.sql_%s' % backup_datetime)
-        run('su %s -c "aws s3 sync s3://%s /home/nginx/openoversight_backup/s3/%s"'
-            % (env.unprivileged_user, env.s3bucket, env.s3bucket))
-        run('tar czfv backup.tar.gz s3/ backup.sql_%s' % backup_datetime)
+        #run('su %s -c "aws s3 sync s3://%s /home/pdx/openoversight_backup/s3/%s"'
+        #    % (env.unprivileged_user, env.s3bucket, env.s3bucket))
+        #run('tar czfv backup.tar.gz s3/ backup.sql_%s' % backup_datetime)
         get(remote_path="backup.tar.gz",
             local_path="./backup/backup-%s-%s.tar.gz"
                        % (env.environment, backup_datetime))
