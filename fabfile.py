@@ -46,9 +46,9 @@ env.roledefs = {
 def deploy():
     with lcd(os.path.dirname(os.path.realpath(__file__))):
         with cd(env.code_dir):
-            run('su %s -c "git fetch && git status"' % env.unprivileged_user)
+#            run('su %s -c "git fetch && git status"' % env.unprivileged_user)
             execute(buildassets)
-            run('su %s -c "git pull"' % env.unprivileged_user)
+#            run('su %s -c "git pull"' % env.unprivileged_user)
             run('su %s -c "PATH=%s/bin:$PATH pip install -r requirements.txt"' % (env.unprivileged_user, env.venv_dir))
             run('su %s -c "mkdir --parents %s/OpenOversight/app/static/dist"' % (env.unprivileged_user, env.code_dir))
             put(local_path=os.path.join('OpenOversight', 'app', 'static', 'dist'),
