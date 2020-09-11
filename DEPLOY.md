@@ -97,7 +97,7 @@ You will want to run gunicorn in the background with multiple worker threads. Yo
 
 We configure the database by setting a .env file in the OpenOversight directory of the repository. A sample .env is:
 ```
-SQLALCHEMY_DATABASE_URI="postgresql://openoversight:terriblepassword@localhost/openoversight-dev"
+SQLALCHEMY_DATABASE_URI="postgresql://openoversight:terriblepassword@localhost/openoversight-prod"
 SECRET_KEY=terriblecsrftoken
 S3_BUCKET_NAME=bucketname-in-the-account-you-created
 AWS_ACCESS_KEY_ID=<access key from AWS>
