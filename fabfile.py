@@ -60,7 +60,7 @@ def deploy():
 def migrate():
     execute(deploy)
     with cd(env.code_dir):
-        run('su %s -c "cd OpenOversight; FLASK_APP=OpenOversight.app %s/bin/flask db upgrade"' % (env.unprivileged_user, env.venv_dir))
+        run('su %s -c "cd %s/OpenOversight; FLASK_APP=OpenOversight.app %s/bin/flask db upgrade"' % (env.unprivileged_user, env.envcode_dir, env.venv_dir))
         run('sudo systemctl restart openoversight')
 
 
