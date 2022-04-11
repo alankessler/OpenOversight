@@ -19,6 +19,7 @@ from PIL import Image as Pimage
 from OpenOversight.app import create_app, models
 from OpenOversight.app.utils import merge_dicts
 from OpenOversight.app.models import db as _db, Unit, Job, Officer
+from OpenOversight.tests.routes.route_helpers import ADMIN_EMAIL, ADMIN_PASSWORD
 
 factory = Faker()
 
@@ -63,7 +64,7 @@ def pick_race():
 
 
 def pick_gender():
-    return random.choice(['M', 'F', 'Not Sure'])
+    return random.choice(['M', 'F', 'Other', None])
 
 
 def pick_first():
@@ -120,20 +121,24 @@ def build_assignment(officer: Officer, units: List[Unit], jobs: Job):
                              resign_date=pick_date(officer.full_name().encode('utf-8')))
 
 
-def build_note(officer, user):
+def build_note(officer, user, content=None):
     date = factory.date_time_this_year()
+    if content is None:
+        content = factory.text()
     return models.Note(
-        text_contents=factory.text(),
+        text_contents=content,
         officer_id=officer.id,
         creator_id=user.id,
         date_created=date,
         date_updated=date)
 
 
-def build_description(officer, user):
+def build_description(officer, user, content=None):
     date = factory.date_time_this_year()
+    if content is None:
+        content = factory.text()
     return models.Description(
-        text_contents=factory.text(),
+        text_contents=content,
         officer_id=officer.id,
         creator_id=user.id,
         date_created=date,
@@ -289,7 +294,21 @@ def add_mockdata(session):
     test_images = [models.Image(filepath='/static/images/test_cop{}.png'.format(x + 1), department_id=1) for x in range(5)] + \
         [models.Image(filepath='/static/images/test_cop{}.png'.format(x + 1), department_id=2) for x in range(5)]
 
+    test_officer_links = [
+        models.Link(
+            url='https://openoversight.com/',
+            link_type='link',
+            title='OpenOversight',
+            description='A public, searchable database of law enforcement officers.'),
+        models.Link(
+            url='http://www.youtube.com/?v=help',
+            link_type='video',
+            title='Youtube',
+            author='the internet'),
+    ]
+
     officers = [generate_officer() for o in range(NUM_OFFICERS)]
+    officers[0].links = test_officer_links
     session.add_all(officers)
     session.add_all(test_images)
 
@@ -326,9 +345,9 @@ def add_mockdata(session):
                             confirmed=True)
     session.add(test_user)
 
-    test_admin = models.User(email='test@example.org',
+    test_admin = models.User(email=ADMIN_EMAIL,
                              username='test_admin',
-                             password='testtest',
+                             password=ADMIN_PASSWORD,
                              confirmed=True,
                              is_administrator=True)
     session.add(test_admin)
@@ -375,12 +394,12 @@ def add_mockdata(session):
     session.add_all(test_license_plates)
     session.commit()
 
-    test_links = [
-        models.Link(url='https://stackoverflow.com/', link_type='link', user=test_admin, user_id=test_admin.id),
-        models.Link(url='http://www.youtube.com/?v=help', link_type='video', user=test_admin, user_id=test_admin.id)
+    test_incident_links = [
+        models.Link(url='https://stackoverflow.com/', link_type='link', creator=test_admin, creator_id=test_admin.id),
+        models.Link(url='http://www.youtube.com/?v=help', link_type='video', creator=test_admin, creator_id=test_admin.id)
     ]
 
-    session.add_all(test_links)
+    session.add_all(test_incident_links)
     session.commit()
 
     test_incidents = [
@@ -388,11 +407,11 @@ def add_mockdata(session):
             date=datetime.date(2016, 3, 16),
             time=datetime.time(4, 20),
             report_number='42',
-            description='A thing happened',
+            description='### A thing happened\n **Markup** description',
             department_id=1,
             address=test_addresses[0],
             license_plates=test_license_plates,
-            links=test_links,
+            links=test_incident_links,
             officers=[all_officers[o] for o in range(4)],
             creator_id=1,
             last_updated_id=1
@@ -405,7 +424,7 @@ def add_mockdata(session):
             department_id=2,
             address=test_addresses[1],
             license_plates=[test_license_plates[0]],
-            links=test_links,
+            links=test_incident_links,
             officers=[all_officers[o] for o in range(3)],
             creator_id=2,
             last_updated_id=1
@@ -417,7 +436,7 @@ def add_mockdata(session):
             department_id=2,
             address=test_addresses[1],
             license_plates=[test_license_plates[0]],
-            links=test_links,
+            links=test_incident_links,
             officers=[all_officers[o] for o in range(1)],
             creator_id=2,
             last_updated_id=1
@@ -430,7 +449,7 @@ def add_mockdata(session):
 
     # for testing routes
     first_officer = models.Officer.query.get(1)
-    note = build_note(first_officer, test_admin)
+    note = build_note(first_officer, test_admin, "### A markdown note\nA **test** note!")
     session.add(note)
     for officer in models.Officer.query.limit(20):
         user = random.choice(users_that_can_create_notes)
@@ -443,7 +462,7 @@ def add_mockdata(session):
 
     # for testing routes
     first_officer = models.Officer.query.get(1)
-    description = build_description(first_officer, test_admin)
+    description = build_description(first_officer, test_admin, "### A markdown description\nA **test** description!")
     session.add(description)
     for officer in models.Officer.query.limit(20):
         user = random.choice(users_that_can_create_descriptions)
